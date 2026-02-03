@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import db from './database.js';
+import db from '../utilities/database.js';
 import e from 'express';
 
 const Post_Image = db.define('Post_Image', {

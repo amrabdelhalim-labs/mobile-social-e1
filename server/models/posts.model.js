@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize';
-import db from './database.js';
+import db from '../utilities/database.js';
 
 const Post = db.define('Post', {
     id: {
