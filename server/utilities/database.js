@@ -1,4 +1,3 @@
-import e from 'express';
 import { Sequelize } from 'sequelize';
 
 export const db = new Sequelize(

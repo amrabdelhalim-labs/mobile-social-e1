@@ -25,7 +25,8 @@ const User = db.define('User', {
   },
   ImageUrl: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
+    defaultValue: '/images/default-profile.svg',
   },
 }, { timestamps: true, });
 

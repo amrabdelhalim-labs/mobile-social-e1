@@ -20,4 +20,13 @@ const login = [
         .notEmpty().withMessage('كلمة المرور مطلوبة'),
 ];
 
-export { register, login };
+const updateInfo = [
+    body('name')
+        .optional({ checkFalsy: true })
+        .isLength({ min: 3 }).withMessage('يجب أن يكون الاسم 3 أحرف على الأقل'),
+    body('password')
+        .optional({ checkFalsy: true })
+        .isLength({ min: 6 }).withMessage('يجب أن تكون كلمة المرور 6 أحرف على الأقل'),
+];
+
+export { register, login, updateInfo };
