@@ -10,8 +10,8 @@ const Like = db.define('Like', {
 }, { timestamps: true, });
 
 Like.associate = (models) => {
-    models.User.belongsToMany(models.Post, {through: 'Like'});
-    models.Post.belongsToMany(models.User, {through: 'Like'});
+    models.User.belongsToMany(models.Post, { through: models.Like });
+    models.Post.belongsToMany(models.User, { through: models.Like });
 };
 
 export default Like;

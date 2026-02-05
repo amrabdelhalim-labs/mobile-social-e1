@@ -26,7 +26,7 @@ router.get('/profile',
 
 router.put('/profile/image',
   middleware.isAuthenticated,
-  upload.single('image'),
+  upload.single('profileImage'),
   controller.updateImage
 );
 
