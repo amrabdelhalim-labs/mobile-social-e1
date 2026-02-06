@@ -12,6 +12,8 @@ const Like = db.define('Like', {
 Like.associate = (models) => {
     models.User.belongsToMany(models.Post, { through: models.Like });
     models.Post.belongsToMany(models.User, { through: models.Like });
+    Like.belongsTo(models.User, { onDelete: 'CASCADE' });
+    Like.belongsTo(models.Post, { onDelete: 'CASCADE' });
 };
 
 export default Like;

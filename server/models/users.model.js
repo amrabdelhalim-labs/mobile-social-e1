@@ -31,8 +31,8 @@ const User = db.define('User', {
 }, { timestamps: true, });
 
 User.associate = models => {
-    User.hasMany(models.Post);
-    User.hasMany(models.Comment);
+    User.hasMany(models.Post, { onDelete: 'CASCADE' });
+    User.hasMany(models.Comment, { onDelete: 'CASCADE' });
 };
 
 export default User;

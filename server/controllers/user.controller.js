@@ -1,7 +1,7 @@
 import models from "../models/index.js";
 import bcrypt from "bcrypt";
 import * as jwt from "../utilities/jwt.js";
-import { imgDirectory } from "../utilities/files.js";
+import { imgDirectory, extractFileName } from "../utilities/files.js";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -98,20 +98,6 @@ const updateImage = async (req, res) => {
         const sanitizeUser = user.toJSON();
         delete sanitizeUser.password;
 
-        const extractFileName = (imageUrl) => {
-            if (!imageUrl) return null;
-            try {
-                if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-                    const urlObj = new URL(imageUrl);
-                    return path.basename(urlObj.pathname);
-                }
-
-                return path.basename(imageUrl);
-            } catch {
-                return null;
-            }
-        };
-
         try {
             const oldFileName = extractFileName(previousImageUrl);
             if (oldFileName && oldFileName !== req.file.filename && oldFileName !== DEFAULT_PROFILE_IMAGE) {
@@ -197,36 +183,44 @@ const deleteUser = async (req, res) => {
 
         const userImageUrl = user.ImageUrl;
 
-        const extractFileName = (imageUrl) => {
-            if (!imageUrl) return null;
-            try {
-                if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-                    const urlObj = new URL(imageUrl);
-                    return path.basename(urlObj.pathname);
-                }
-                
-                return path.basename(imageUrl);
-            } catch {
-                return null;
-            }
-        };
+        // جمع صور منشورات المستخدم لحذفها من القرص
+        const userPosts = await models.Post.findAll({
+            where: { UserId: userId },
+            include: [{ model: models.Post_Image }]
+        });
 
+        const filesToDelete = [];
+
+        for (const post of userPosts) {
+            if (post.Post_Images) {
+                for (const img of post.Post_Images) {
+                    const fileName = extractFileName(img.imageUrl);
+                    if (fileName) {
+                        filesToDelete.push(fileName);
+                    }
+                }
+            }
+        }
+
+        // حذف صورة الملف الشخصي
+        const profileFileName = extractFileName(userImageUrl);
+        if (profileFileName && profileFileName !== DEFAULT_PROFILE_IMAGE) {
+            filesToDelete.push(profileFileName);
+        }
+
+        // حذف المستخدم (CASCADE سيحذف المنشورات والتعليقات والإعجابات)
         await user.destroy();
 
-        try {
-            const fileName = extractFileName(userImageUrl);
-            if (fileName && fileName !== DEFAULT_PROFILE_IMAGE) {
-                const imagesRoot = path.resolve(process.cwd(), imgDirectory);
-                const filePath = path.join(imagesRoot, fileName);
-
-                await fs.promises.unlink(filePath).catch((err) => {
-                    if (err?.code !== 'ENOENT') {
-                        console.error('Failed to delete user profile picture:', err.message);
-                    }
-                });
+        // تنظيف الملفات من القرص
+        const imagesRoot = path.resolve(process.cwd(), imgDirectory);
+        for (const fileName of filesToDelete) {
+            try {
+                await fs.promises.unlink(path.join(imagesRoot, fileName));
+            } catch (err) {
+                if (err?.code !== 'ENOENT') {
+                    console.error('Failed to delete file:', fileName, err.message);
+                }
             }
-        } catch (err) {
-            console.error('Error while cleaning user profile picture:', err?.message || err);
         }
 
         return res.status(200).json({ message: "تم حذف الحساب بنجاح" });

@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import db from '../utilities/database.js';
-import e from 'express';
 
 const Post_Image = db.define('Post_Image', {
     id: {
@@ -15,7 +14,7 @@ const Post_Image = db.define('Post_Image', {
 }, { timestamps: true, });
 
 Post_Image.associate = models => {
-    Post_Image.belongsTo(models.Post);
+    Post_Image.belongsTo(models.Post, { onDelete: 'CASCADE' });
 };
 
 export default Post_Image;

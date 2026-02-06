@@ -1,5 +1,5 @@
 import models from "../models/index.js";
-import { imgDirectory } from "../utilities/files.js";
+import { imgDirectory, extractFileName } from "../utilities/files.js";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -110,6 +110,7 @@ const newPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
     try {
+        const currentUserId = req.currentUser?.id;
         const page = Math.max(parseInt(req.query.page) || 1, 1);
         const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 50);
         const offset = (page - 1) * limit;
@@ -159,9 +160,20 @@ const getAllPosts = async (req, res) => {
             }, {});
         }
 
+        let userLikesSet = new Set();
+        if (currentUserId && postIds.length > 0) {
+            const userLikes = await models.Like.findAll({
+                attributes: ['PostId'],
+                where: { UserId: currentUserId, PostId: postIds },
+                raw: true,
+            });
+            userLikesSet = new Set(userLikes.map((l) => l.PostId));
+        }
+
         const postsWithLikes = posts.map((post) => ({
             ...post.toJSON(),
             likesCount: likesMap[post.id] || 0,
+            isLiked: userLikesSet.has(post.id),
         }));
 
         const totalPages = Math.ceil(count / limit);
@@ -188,6 +200,7 @@ const getMyPosts = async (req, res) => {
             return res.status(401).json({ message: "غير مصرح" });
         }
 
+        const currentUserId = userId;
         const page = Math.max(parseInt(req.query.page) || 1, 1);
         const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 50);
         const offset = (page - 1) * limit;
@@ -238,9 +251,20 @@ const getMyPosts = async (req, res) => {
             }, {});
         }
 
+        let userLikesSet = new Set();
+        if (currentUserId && postIds.length > 0) {
+            const userLikes = await models.Like.findAll({
+                attributes: ['PostId'],
+                where: { UserId: currentUserId, PostId: postIds },
+                raw: true,
+            });
+            userLikesSet = new Set(userLikes.map((l) => l.PostId));
+        }
+
         const postsWithLikes = posts.map((post) => ({
             ...post.toJSON(),
             likesCount: likesMap[post.id] || 0,
+            isLiked: userLikesSet.has(post.id),
         }));
 
         const totalPages = Math.ceil(count / limit);
@@ -296,10 +320,20 @@ const getPostById = async (req, res) => {
 
         const likesCount = await models.Like.count({ where: { PostId: postId } });
 
+        const currentUserId = req.currentUser?.id;
+        let isLiked = false;
+        if (currentUserId) {
+            const userLike = await models.Like.findOne({
+                where: { UserId: currentUserId, PostId: postId },
+            });
+            isLiked = !!userLike;
+        }
+
         return res.status(200).json({
             post: {
                 ...post.toJSON(),
                 likesCount,
+                isLiked,
             },
         });
     } catch (error) {
@@ -395,14 +429,16 @@ const updatePost = async (req, res) => {
                 });
 
                 for (const img of existingImages) {
-                    const fileName = path.basename(img.imageUrl);
-                    const filePath = path.resolve(process.cwd(), imgDirectory, fileName);
+                    const fileName = extractFileName(img.imageUrl);
+                    if (fileName) {
+                        const filePath = path.resolve(process.cwd(), imgDirectory, fileName);
 
-                    await fs.promises.unlink(filePath).catch((err) => {
-                        if (err?.code !== 'ENOENT') {
-                            console.error('Failed to delete post image:', err.message);
-                        }
-                    });
+                        await fs.promises.unlink(filePath).catch((err) => {
+                            if (err?.code !== 'ENOENT') {
+                                console.error('Failed to delete post image:', err.message);
+                            }
+                        });
+                    }
 
                     await img.destroy();
                 }
@@ -492,21 +528,20 @@ const deletePost = async (req, res) => {
         // حذف صور المنشور من السيرفر
         if (post.Post_Images && post.Post_Images.length > 0) {
             for (const img of post.Post_Images) {
-                const fileName = path.basename(img.imageUrl);
-                const filePath = path.resolve(process.cwd(), imgDirectory, fileName);
+                const fileName = extractFileName(img.imageUrl);
+                if (fileName) {
+                    const filePath = path.resolve(process.cwd(), imgDirectory, fileName);
 
-                await fs.promises.unlink(filePath).catch((err) => {
-                    if (err?.code !== 'ENOENT') {
-                        console.error('Failed to delete post image:', err.message);
-                    }
-                });
+                    await fs.promises.unlink(filePath).catch((err) => {
+                        if (err?.code !== 'ENOENT') {
+                            console.error('Failed to delete post image:', err.message);
+                        }
+                    });
+                }
             }
         }
 
-        await models.Comment.destroy({ where: { PostId: postId } });
-        await models.Like.destroy({ where: { PostId: postId } });
-        await models.Post_Image.destroy({ where: { PostId: postId } });
-
+        // CASCADE سيحذف التعليقات والإعجابات والصور تلقائياً
         await post.destroy();
 
         return res.status(200).json({ message: "تم حذف المنشور بنجاح" });

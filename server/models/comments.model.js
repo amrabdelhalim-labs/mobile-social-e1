@@ -14,8 +14,8 @@ const Comment = db.define('Comment', {
 }, { timestamps: true, });
 
 Comment.associate = models => {
-    Comment.belongsTo(models.User);
-    Comment.belongsTo(models.Post);
+    Comment.belongsTo(models.User, { onDelete: 'CASCADE' });
+    Comment.belongsTo(models.Post, { onDelete: 'CASCADE' });
 };
 
 export default Comment;

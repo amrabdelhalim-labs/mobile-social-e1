@@ -1,6 +1,20 @@
 import multer from "multer";
+import path from "node:path";
 
 const imgDirectory = './public/images/';
+
+const extractFileName = (imageUrl) => {
+    if (!imageUrl) return null;
+    try {
+        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+            const urlObj = new URL(imageUrl);
+            return path.basename(urlObj.pathname);
+        }
+        return path.basename(imageUrl);
+    } catch {
+        return null;
+    }
+};
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -26,4 +40,4 @@ const upload = multer({
     }
 });
 
-export { upload, imgDirectory };
+export { upload, imgDirectory, extractFileName };

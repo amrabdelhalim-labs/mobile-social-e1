@@ -30,9 +30,9 @@ const Post = db.define('Post', {
 }, { timestamps: true, });
 
 Post.associate = models => {
-    Post.belongsTo(models.User);
-    Post.hasMany(models.Post_Image);
-    Post.hasMany(models.Comment);
+    Post.belongsTo(models.User, { onDelete: 'CASCADE' });
+    Post.hasMany(models.Post_Image, { onDelete: 'CASCADE' });
+    Post.hasMany(models.Comment, { onDelete: 'CASCADE' });
 };
 
 export default Post;
