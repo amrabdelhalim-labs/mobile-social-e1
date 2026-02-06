@@ -1,0 +1,37 @@
+.post-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.post-author ion-avatar {
+  width: 40px;
+  height: 40px;
+}
+
+.author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.author-name {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.post-time {
+  margin: 0;
+  font-size: 12px;
+}
+
+ion-card {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+ion-card:hover {
+  transform: translateY(-2px);
+}

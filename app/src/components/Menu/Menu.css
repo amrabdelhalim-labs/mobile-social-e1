@@ -1,0 +1,10 @@
+.menu-avatar {
+  width: 100px;
+  height: 100px;
+  margin: 20px auto;
+  display: block;
+}
+
+.menu-avatar img {
+  border: 3px solid var(--ion-color-primary);
+}

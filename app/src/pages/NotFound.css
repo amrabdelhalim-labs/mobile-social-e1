@@ -1,0 +1,35 @@
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  padding: 2rem;
+}
+
+.not-found-icon {
+  font-size: 120px;
+  color: var(--ion-color-medium);
+  margin-bottom: 1rem;
+}
+
+.not-found-container h1 {
+  font-size: 72px;
+  font-weight: bold;
+  color: var(--ion-color-primary);
+  margin: 0;
+}
+
+.not-found-container h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+  margin: 0.5rem 0;
+}
+
+.not-found-container p {
+  font-size: 16px;
+  color: var(--ion-color-medium);
+  margin: 1rem 0 2rem;
+  max-width: 400px;
+}
