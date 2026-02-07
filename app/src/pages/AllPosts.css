@@ -1,37 +1,41 @@
-.post-author {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+
+.card {
+    background-color: #fff;
 }
 
-.post-author ion-avatar {
-  width: 40px;
-  height: 40px;
+.post-avatar {
+    width: 50px;
+    height: 50px;
 }
 
-.author-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.post-user {
+    display: block;
+    padding-bottom: 0;
+    margin: 0;
 }
 
-.author-name {
-  margin: 0;
-  font-weight: 600;
-  font-size: 14px;
+.post-moment {
+    font-size: 10px;
+    padding-top: 0;
+    margin: 0;
 }
 
-.post-time {
-  margin: 0;
-  font-size: 12px;
+.post-title {
+    font-size: 24px;
 }
 
-ion-card {
-  cursor: pointer;
-  transition: transform 0.2s ease;
+.post-contents {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 10px;
 }
 
-ion-card:hover {
-  transform: translateY(-2px);
+.post-image {
+    height: 240px;
+    width: 100%;
+    object-fit: cover;
 }
+

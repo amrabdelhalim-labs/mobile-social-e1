@@ -1,0 +1,84 @@
+@font-face {
+    font-family: "FontAwesome";
+    font-weight: normal;
+    font-style : normal;
+           src : url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/FontAwesome.otf");
+}
+
+.post-icon {
+    font-size: 25px;
+    display: block;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.post-like {
+    margin-right: 5px;
+}
+
+.post-time {
+    font-size: 10px;
+    margin-right: 5px !important;
+    margin-top: 5px;
+}
+
+.post-username {
+    margin-top: 10px;
+    margin-right: 5px;
+}
+
+.comment-avatar {
+    width: 50px;
+    height: 50px;
+    margin-top: 10px;
+}
+
+.comment-card {
+    width: 80%;
+    background-color: #fff;
+    margin-right: 5px;
+    margin-bottom: 0;
+    padding-right: 10px;
+}
+
+.comment-text {
+    margin-right: 10px;
+    margin-top: 0;
+}
+
+.send-icon {
+    margin-top: 25px;
+    transform: rotate(180deg);
+    background-color: var(--ion-color-primary-tint);
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.swiper {
+    direction: ltr;
+}
+
+.swiper-slide {
+    cursor: pointer;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    background-color: rgba(255, 255, 255, 0.5);
+    right:10px;
+    padding: 15px;
+    color: var(--ion-color-primary) !important;
+    fill: black !important;
+    stroke: black !important;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 20px !important;
+}
+
+.swiper-pagination-bullet-active {
+    background:  var(--ion-color-primary) !important;
+}
+

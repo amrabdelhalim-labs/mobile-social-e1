@@ -1,0 +1,22 @@
+@font-face {
+    font-family: "FontAwesome";
+    font-weight: normal;
+    font-style : normal;
+           src : url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/FontAwesome.otf");
+  }
+
+.post-icon {
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.card {
+    background-color: #fff;
+}
+
+.post-image {
+    height: 240px;
+    width: 100%;
+    object-fit: cover;
+}
+

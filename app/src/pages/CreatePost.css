@@ -1,0 +1,74 @@
+div.RichEditor-root {
+    background-color: #F9FAFF;
+    width:90%;
+    margin:auto;
+    box-shadow: 0px 0px 6px 1px rgba(0,0,0,0.5);
+    height:auto;
+    overflow-y: scroll;
+    padding:20px;
+    font-size: 18px;
+    font-family: 'calibri', sans-serif;
+}
+
+ion-content{
+    --ion-background-color:#F9FAFF;
+}
+
+.icon-images{
+    font-size: 100px;
+    margin: auto;
+}
+
+div.icon-container {
+    margin: auto;
+}
+
+
+.RichEditor-root {
+    background: #fff;
+    border: 1px solid #ddd;
+    font-family: 'Georgia', serif;
+    font-size: 14px;
+    padding: 15px;
+  }
+  
+  .RichEditor-editor {
+    border-top: 1px solid #ddd;
+    cursor: text;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+  
+  .RichEditor-editor .public-DraftEditorPlaceholder-root,
+  .RichEditor-editor .public-DraftEditor-content {
+    margin: 0 -15px -15px;
+    padding: 15px;
+  }
+  
+  .RichEditor-editor .public-DraftEditor-content {
+    min-height: 100px;
+  }
+  
+  
+  .RichEditor-editor .public-DraftStyleDefault-pre {
+    background-color: rgba(0, 0, 0, 0.05);
+    font-family: 'Inconsolata', 'Menlo', 'Consolas', monospace;
+    font-size: 16px;
+    padding: 20px;
+  }
+  
+  .RichEditor-controls {
+    font-family: 'Helvetica', sans-serif;
+    font-size: 14px;
+    margin-bottom: 5px;
+    user-select: none;
+  }
+  
+  .RichEditor-styleButton {
+    color: #999;
+    cursor: pointer;
+    margin-right: 16px;
+    padding: 2px 0;
+    display: inline-block;
+  }
+  

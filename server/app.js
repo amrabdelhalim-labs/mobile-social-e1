@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json({ limit: '1mb' }));
-app.use('/api', router);
+app.use('/', router);
 app.use('/images', express.static('public/images'));
 
 // Error handler عام
