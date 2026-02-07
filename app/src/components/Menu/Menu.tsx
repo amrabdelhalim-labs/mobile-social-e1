@@ -18,13 +18,17 @@ import {
     clipboardOutline,
     logOutOutline,
 } from 'ionicons/icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { useHistory } from 'react-router';
+import { AuthContext } from '../../context/AuthContext';
+import { LOGIN_URL } from '../../config/urls';
 import './Menu.css';
 
 const Menu: React.FC = () => {
     const [side, setSide] = useState<'start' | 'end'>('end');
-    const [name, setName] = useState('مستخدم تجريبي');
-    const [profileImg, setProfileImg] = useState('https://i.pravatar.cc/100?img=12');
+
+    const { logout, user, getProfileImageUrl } = useContext(AuthContext);
+    const history = useHistory();
 
     useEffect(() => {
         const mediaQuery = window.matchMedia('(max-width: 992px)');
@@ -40,20 +44,14 @@ const Menu: React.FC = () => {
         handleMediaChange(mediaQuery);
         mediaQuery.addEventListener('change', handleMediaChange);
 
-        // TODO: Fetch user profile from API
-        // getProfile();
-
         return () => {
             mediaQuery.removeEventListener('change', handleMediaChange);
         };
     }, []);
 
-    const handleLogout = () => {
-        // TODO: Implement logout logic
-        console.log('Logout clicked');
-        // await Storage.remove({key: 'accessToken'})
-        // setLoggedIn(false)
-        // history.push('/account/login')
+    const handleLogout = async () => {
+        await logout();
+        history.push(`/${LOGIN_URL}`);
     };
 
     return (
@@ -65,11 +63,14 @@ const Menu: React.FC = () => {
             </IonHeader>
             <IonContent>
                 <IonAvatar className="menu-avatar">
-                    <IonImg src={profileImg} alt="صورة المستخدم" />
+                    <IonImg
+                        src={getProfileImageUrl(user?.ImageUrl)}
+                        alt="صورة المستخدم"
+                    />
                 </IonAvatar>
                 <div className="ion-text-center ion-margin-top">
                     <IonText color="primary">
-                        <h3>{name}</h3>
+                        <h3>{user?.name ?? 'مستخدم'}</h3>
                     </IonText>
                 </div>
                 <IonList>

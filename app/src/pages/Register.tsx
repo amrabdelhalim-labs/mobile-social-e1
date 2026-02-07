@@ -18,12 +18,13 @@ import {
 import { personAddOutline } from 'ionicons/icons';
 import { Formik, type FormikHelpers } from 'formik';
 import * as yup from 'yup';
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useHistory } from 'react-router';
 import { AxiosError } from 'axios';
 import Header from '../components/Header/Header';
 import api from '../config/axios';
-import { REGISTER_URL } from '../config/urls';
+import { REGISTER_URL, LOGIN_URL } from '../config/urls';
+import { AuthContext } from '../context/AuthContext';
 import './Register.css';
 
 interface RegisterFormValues {
@@ -59,7 +60,15 @@ const Register: React.FC = () => {
     const [successAlert, setSuccessAlert] = useState(false);
     const [errorAlert, setErrorAlert] = useState(false);
 
+    const { loggedIn, jwt } = useContext(AuthContext);
     const history = useHistory();
+
+    // التوجيه التلقائي: إذا كان المستخدم مسجل الدخول بالفعل يُوجّه للرئيسية
+    useEffect(() => {
+        if (loggedIn && jwt) {
+            history.replace('/tabs/home');
+        }
+    }, [loggedIn, jwt, history]);
 
     const handleRegister = async (
         values: RegisterFormValues,
@@ -87,7 +96,7 @@ const Register: React.FC = () => {
             <Header
                 title="تسجيل مستخدم جديد"
                 showMenuButton={false}
-                defaultHref="/account/login"
+                defaultHref={`/${LOGIN_URL}`}
             />
 
             <IonLoading isOpen={loading} message="جارٍ إنشاء الحساب..." />
@@ -101,7 +110,7 @@ const Register: React.FC = () => {
                 buttons={[
                     {
                         text: 'تسجيل الدخول',
-                        handler: () => history.push('/account/login'),
+                        handler: () => history.push(`/${LOGIN_URL}`),
                     },
                 ]}
             />
@@ -115,7 +124,7 @@ const Register: React.FC = () => {
                 buttons={[
                     {
                         text: 'تسجيل الدخول',
-                        handler: () => history.push('/account/login'),
+                        handler: () => history.push(`/${LOGIN_URL}`),
                     },
                     { text: 'إلغاء', role: 'cancel' },
                 ]}
@@ -214,7 +223,7 @@ const Register: React.FC = () => {
                                             </IonButton>
                                             <IonText className="ion-padding-top" style={{ display: 'block', marginTop: '16px' }}>
                                                 <span>لديك حساب بالفعل؟ </span>
-                                                <IonRouterLink routerLink="/account/login" color="primary">
+                                                <IonRouterLink routerLink={`/${LOGIN_URL}`} color="primary">
                                                     تسجيل الدخول
                                                 </IonRouterLink>
                                             </IonText>

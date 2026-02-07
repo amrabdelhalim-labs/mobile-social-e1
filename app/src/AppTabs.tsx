@@ -7,16 +7,44 @@ import {
     IonTabButton,
     IonTabs,
 } from '@ionic/react';
+import { useContext, useEffect, useMemo } from 'react';
+import { useHistory, useLocation } from 'react-router';
 import { addCircle, home, person, list } from 'ionicons/icons';
+import { AuthContext } from './context/AuthContext';
 import AllPosts from './pages/AllPosts';
 import MyPosts from './pages/MyPosts';
 import CreatePost from './pages/CreatePost';
 import GetPost from './pages/GetPost';
 import UpdatePost from './pages/UpdatePost';
 import Profile from './pages/Profile';
-import NotFound from './pages/NotFound';
 
 const AppTabs: React.FC = () => {
+    const { loggedIn } = useContext(AuthContext);
+    const history = useHistory();
+    const location = useLocation();
+
+    const isValidTabsPath = useMemo(() => {
+        const path = location.pathname;
+        if (path === '/tabs') return true;
+        return /^\/tabs\/(home|profile|posts\/create|posts\/me|posts\/[0-9a-f-]+(\/edit)?)$/.test(path);
+    }, [location.pathname]);
+
+    // حماية جميع مسارات /tabs - توجيه للـ login إذا لم يكن مسجل الدخول
+    useEffect(() => {
+        if (!loggedIn) {
+            history.replace('/account/login');
+        }
+    }, [loggedIn, history, location]);
+
+    // عرض فارغ أثناء التحقق من الحالة
+    if (!loggedIn) {
+        return null;
+    }
+
+    if (!isValidTabsPath) {
+        return <Redirect to="/not-found" />;
+    }
+
     return (
         <IonTabs>
             <IonRouterOutlet>
@@ -40,9 +68,6 @@ const AppTabs: React.FC = () => {
                 </Route>
                 <Route exact path="/tabs">
                     <Redirect to="/tabs/home" />
-                </Route>
-                <Route>
-                    <NotFound />
                 </Route>
             </IonRouterOutlet>
 

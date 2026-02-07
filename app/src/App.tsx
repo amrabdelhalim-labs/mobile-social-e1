@@ -3,6 +3,7 @@ import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import NotFound from './pages/NotFound';
 import AppTabs from './AppTabs';
 import Menu from './components/Menu/Menu';
 import AuthContextProvider from './context/AuthContext';
@@ -56,6 +57,12 @@ const App: React.FC = () => (
           </Route>
           <Route exact path="/">
             <Redirect to="/tabs/home" />
+          </Route>
+          <Route exact path="/not-found">
+            <NotFound />
+          </Route>
+          <Route>
+            <NotFound />
           </Route>
         </IonRouterOutlet>
       </IonReactRouter>
