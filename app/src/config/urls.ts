@@ -7,6 +7,7 @@ export const LOGIN_URL = 'account/login';
 export const PROFILE_URL = 'account/profile';
 export const PROFILE_UPDATE_INFO_URL = 'account/profile/info';
 export const PROFILE_UPDATE_IMAGE_URL = 'account/profile/image';
+export const PROFILE_RESET_IMAGE_URL = 'account/profile/image/reset';
 export const PROFILE_DELETE_URL = 'account/profile';
 
 // Post routes (/posts)

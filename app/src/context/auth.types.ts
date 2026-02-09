@@ -1,14 +1,8 @@
 import { createContext } from 'react';
+import type { UserProfile } from '../types/user.types';
 
-// بيانات المستخدم المرجعة من السيرفر (بدون كلمة المرور)
-export interface UserProfile {
-    id: number;
-    name: string;
-    email: string;
-    ImageUrl: string;
-    createdAt: string;
-    updatedAt: string;
-}
+// إعادة التصدير لتجنب كسر الملفات الموجودة
+export type { UserProfile };
 
 export interface AuthContextType {
     loggedIn: boolean;

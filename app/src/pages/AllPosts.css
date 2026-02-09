@@ -1,41 +1,7 @@
-
-.card {
-    background-color: #fff;
-}
-
-.post-avatar {
-    width: 50px;
-    height: 50px;
-}
-
-.post-user {
-    display: block;
-    padding-bottom: 0;
-    margin: 0;
-}
-
-.post-moment {
-    font-size: 10px;
-    padding-top: 0;
-    margin: 0;
-}
-
-.post-title {
-    font-size: 24px;
-}
-
-.post-contents {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 10px;
-}
-
-.post-image {
-    height: 240px;
-    width: 100%;
-    object-fit: cover;
-}
+/*
+ * تنسيقات صفحة جميع المنشورات (AllPosts)
+ * ─────────────────────────────────────────
+ * التنسيقات الأساسية للبطاقات موجودة في PostCard.css
+ * هنا فقط تنسيقات خاصة بالصفحة نفسها
+ */
 

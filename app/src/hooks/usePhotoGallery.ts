@@ -9,15 +9,12 @@ import { useState } from 'react';
 export function usePhotoGallery() {
     const [blobUrl, setBlobUrl] = useState<string | undefined>();
 
-    const takePhoto = async (): Promise<void> => {
+    const takePhoto = async (source: CameraSource): Promise<void> => {
         try {
             const cameraPhoto = await Camera.getPhoto({
                 resultType: CameraResultType.Uri,
-                source: CameraSource.Prompt,
+                source,
                 quality: 70,
-                promptLabelHeader: 'صورة',
-                promptLabelPhoto: 'من ملفات الصور',
-                promptLabelPicture: 'التقط صورة',
             });
             setBlobUrl(cameraPhoto.webPath);
         } catch {

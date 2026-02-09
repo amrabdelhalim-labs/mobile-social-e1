@@ -26,7 +26,7 @@ const AppTabs: React.FC = () => {
     const isValidTabsPath = useMemo(() => {
         const path = location.pathname;
         if (path === '/tabs') return true;
-        return /^\/tabs\/(home|profile|posts\/create|posts\/me|posts\/[0-9a-f-]+(\/edit)?)$/.test(path);
+        return /^\/tabs\/(home|profile|posts\/create|posts\/me|posts\/\d+(\/edit)?)$/.test(path);
     }, [location.pathname]);
 
     // حماية جميع مسارات /tabs - توجيه للـ login إذا لم يكن مسجل الدخول
@@ -60,10 +60,10 @@ const AppTabs: React.FC = () => {
                 <Route exact path="/tabs/profile">
                     <Profile />
                 </Route>
-                <Route exact path="/tabs/posts/:id([0-9a-f-]+)/edit">
+                <Route exact path="/tabs/posts/:id(\d+)/edit">
                     <UpdatePost />
                 </Route>
-                <Route exact path="/tabs/posts/:id([0-9a-f-]+)">
+                <Route exact path="/tabs/posts/:id(\d+)">
                     <GetPost />
                 </Route>
                 <Route exact path="/tabs">

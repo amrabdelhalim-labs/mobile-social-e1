@@ -1,0 +1,83 @@
+/*
+ * تنسيقات مكوّن بطاقة المنشور (PostCard)
+ * ─────────────────────────────────────────
+ */
+
+/* ─── صورة الغلاف ─── */
+.post-card-image {
+    height: 220px;
+    width: 100%;
+    object-fit: cover;
+}
+
+/* ─── بيانات المؤلف ─── */
+.post-card-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-card-avatar {
+    width: 40px;
+    height: 40px;
+}
+
+.post-card-author-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.post-card-author-name {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.post-card-time {
+    font-size: 0.75rem;
+}
+
+/* ─── زر الخيارات ─── */
+.post-card-options-btn {
+    --padding-start: 4px;
+    --padding-end: 4px;
+    margin: 0;
+}
+
+/* ─── العنوان والوصف ─── */
+.post-card-title {
+    font-size: 1.15rem;
+    margin-top: 10px;
+}
+
+.post-card-content {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 6px;
+    font-size: 0.85rem;
+}
+
+/* ─── شريط الإحصائيات ─── */
+.post-card-stats {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid var(--ion-color-light-shade, #e0e0e0);
+}
+
+.post-card-stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+}
+
+.post-card-stat ion-icon {
+    font-size: 1.1rem;
+}

@@ -12,20 +12,26 @@ import {
     IonImg,
     IonText,
     IonMenuToggle,
+    IonToggle,
 } from '@ionic/react';
 import {
     personCircleOutline,
     clipboardOutline,
     logOutOutline,
+    moonOutline,
+    sunnyOutline,
 } from 'ionicons/icons';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useMemo } from 'react';
 import { useHistory } from 'react-router';
 import { AuthContext } from '../../context/AuthContext';
 import { LOGIN_URL } from '../../config/urls';
+import { Preferences } from '@capacitor/preferences';
 import './Menu.css';
 
 const Menu: React.FC = () => {
     const [side, setSide] = useState<'start' | 'end'>('end');
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [themeLoaded, setThemeLoaded] = useState(false);
 
     const { logout, user, getProfileImageUrl } = useContext(AuthContext);
     const history = useHistory();
@@ -49,16 +55,52 @@ const Menu: React.FC = () => {
         };
     }, []);
 
+    // تحميل وضع المظهر (من التخزين أو من إعدادات النظام)
+    useEffect(() => {
+        const themeKey = 'theme';
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+        const loadTheme = async () => {
+            const { value } = await Preferences.get({ key: themeKey });
+            if (value === 'dark' || value === 'light') {
+                setIsDarkMode(value === 'dark');
+            } else {
+                setIsDarkMode(systemPrefersDark.matches);
+            }
+            setThemeLoaded(true);
+        };
+
+        const handleSystemThemeChange = async (e: MediaQueryListEvent) => {
+            const { value } = await Preferences.get({ key: themeKey });
+            if (!value) {
+                setIsDarkMode(e.matches);
+            }
+        };
+
+        loadTheme();
+        systemPrefersDark.addEventListener('change', handleSystemThemeChange);
+        return () => systemPrefersDark.removeEventListener('change', handleSystemThemeChange);
+    }, []);
+
+    // تطبيق المظهر على مستوى التطبيق
+    useEffect(() => {
+        if (!themeLoaded) return;
+        document.documentElement.classList.toggle('ion-palette-dark', isDarkMode);
+        Preferences.set({ key: 'theme', value: isDarkMode ? 'dark' : 'light' });
+    }, [isDarkMode, themeLoaded]);
+
     const handleLogout = async () => {
         await logout();
         history.push(`/${LOGIN_URL}`);
     };
 
+    const themeLabel = useMemo(() => (isDarkMode ? 'الوضع الداكن' : 'الوضع الفاتح'), [isDarkMode]);
+
     return (
         <IonMenu side={side} contentId="menu">
             <IonHeader>
                 <IonToolbar>
-                    <IonTitle>القائمة</IonTitle>
+                    <IonTitle className="ion-text-center">القائمة</IonTitle>
                 </IonToolbar>
             </IonHeader>
             <IonContent>
@@ -74,10 +116,23 @@ const Menu: React.FC = () => {
                     </IonText>
                 </div>
                 <IonList>
+                    <IonItem lines="none">
+                        <IonIcon
+                            color="primary"
+                            icon={isDarkMode ? moonOutline : sunnyOutline}
+                            slot="start"
+                        />
+                        <IonLabel>{themeLabel}</IonLabel>
+                        <IonToggle
+                            slot="end"
+                            checked={isDarkMode}
+                            onIonChange={(e) => setIsDarkMode(e.detail.checked)}
+                        />
+                    </IonItem>
                     <IonMenuToggle autoHide={true}>
                         <IonItem routerLink="/tabs/profile" routerDirection="root" button>
                             <IonIcon color="primary" icon={personCircleOutline} slot="start" />
-                            <IonLabel>الصفحة الشخصية</IonLabel>
+                            <IonLabel>البيانات الشخصية</IonLabel>
                         </IonItem>
                     </IonMenuToggle>
                     <IonMenuToggle autoHide={true}>

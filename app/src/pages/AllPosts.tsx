@@ -1,34 +1,106 @@
+/**
+ * صفحة جميع المنشورات (AllPosts)
+ * ────────────────────────────────
+ * تجلب المنشورات من السيرفر: GET /posts?page=N&limit=10
+ * الاستجابة: { posts: Post[], pagination: Pagination }
+ *
+ * الميزات:
+ * ─ Pull-to-refresh لإعادة تحميل المنشورات
+ * ─ Infinite scroll لتحميل المزيد تلقائيًا عند التمرير
+ * ─ عرض المؤلف (صورة + اسم) والوقت النسبي (moment)
+ * ─ عرض عدد الإعجابات والتعليقات (بدون تفاعل مباشر)
+ * ─ الضغط على البطاقة ينقل لصفحة المنشور المفرد
+ * ─ حالة فارغة إذا لم توجد منشورات
+ *
+ * يستخدم مكوّن PostCard المشترك مع showAuthor=true
+ * ولا يُمرّر onOptions (لا خيارات تعديل/حذف — فقط في MyPosts)
+ */
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    IonContent,
-    IonPage,
     IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardSubtitle,
     IonCardTitle,
-    IonAvatar,
-    IonImg,
-    IonText,
-    IonGrid,
-    IonRow,
     IonCol,
+    IonContent,
+    IonGrid,
+    IonInfiniteScroll,
+    IonInfiniteScrollContent,
+    IonLoading,
+    IonPage,
     IonRefresher,
     IonRefresherContent,
+    IonRow,
+    IonText,
 } from '@ionic/react';
 import Header from '../components/Header/Header';
+import PostCard from '../components/PostCard/PostCard';
+import api from '../config/axios';
+import { GET_ALL_POSTS } from '../config/urls';
+import type { Post, PostsResponse } from '../types/post.types';
 import './AllPosts.css';
 
 const AllPosts: React.FC = () => {
-    const handleRefresh = (event: CustomEvent) => {
-        setTimeout(() => {
-            // TODO: Fetch posts from API
-            event.detail.complete();
-        }, 1000);
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
+    // ref لمنع الجلب المتكرر أثناء طلب جارٍ
+    const isFetching = useRef(false);
+
+    /**
+     * جلب المنشورات من السيرفر
+     * @param page رقم الصفحة
+     * @param replace true = استبدال القائمة (refresh)، false = إلحاق (infinite scroll)
+     */
+    const fetchPosts = useCallback(async (page: number, replace = false) => {
+        if (isFetching.current) return;
+        isFetching.current = true;
+
+        try {
+            if (replace) setLoading(true);
+
+            const res = await api.get<PostsResponse>(GET_ALL_POSTS, {
+                params: { page, limit: 10 },
+            });
+
+            const { posts: newPosts, pagination } = res.data;
+
+            setPosts((prev) => (replace ? newPosts : [...prev, ...newPosts]));
+            setCurrentPage(pagination.currentPage);
+            setTotalPages(pagination.totalPages);
+        } catch (error) {
+            console.error('فشل جلب المنشورات:', error);
+        } finally {
+            setLoading(false);
+            isFetching.current = false;
+        }
+    }, []);
+
+    // الجلب الأولي عند فتح الصفحة
+    useEffect(() => {
+        fetchPosts(1, true);
+    }, [fetchPosts]);
+
+    /** Pull-to-refresh: إعادة تحميل من الصفحة الأولى */
+    const handleRefresh = async (event: CustomEvent) => {
+        await fetchPosts(1, true);
+        event.detail.complete();
+    };
+
+    /** Infinite scroll: تحميل الصفحة التالية */
+    const handleInfinite = async (event: CustomEvent) => {
+        if (currentPage < totalPages) {
+            await fetchPosts(currentPage + 1, false);
+        }
+        (event.target as HTMLIonInfiniteScrollElement).complete();
     };
 
     return (
         <IonPage>
             <Header title="المنشورات" showBackButton={false} />
+
+            <IonLoading isOpen={loading} message="جار التحميل..." />
+
             <IonContent className="ion-padding">
                 <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
                     <IonRefresherContent />
@@ -36,67 +108,42 @@ const AllPosts: React.FC = () => {
 
                 <IonGrid>
                     <IonRow>
-                        <IonCol size="12" sizeMd="6">
-                            <IonCard routerLink="/tabs/posts/1">
-                                <IonImg
-                                    src="https://picsum.photos/400/300?random=1"
-                                    alt="منشور تجريبي"
+                        {/* ─── قائمة المنشورات ─── */}
+                        {!loading && posts.length > 0 &&
+                            posts.map((post) => (
+                                <PostCard
+                                    key={post.id}
+                                    post={post}
+                                    showAuthor={true}
+                                    routerLink={`/tabs/posts/${post.id}`}
                                 />
-                                <IonCardHeader>
-                                    <div className="post-author">
-                                        <IonAvatar>
-                                            <IonImg src="https://i.pravatar.cc/100?img=1" />
-                                        </IonAvatar>
-                                        <div className="author-info">
-                                            <IonText>
-                                                <p className="author-name">أحمد محمد</p>
-                                            </IonText>
-                                            <IonText color="medium">
-                                                <p className="post-time">منذ ساعتين</p>
-                                            </IonText>
-                                        </div>
-                                    </div>
-                                    <IonCardTitle>منشور تجريبي رقم 1</IonCardTitle>
-                                    <IonCardSubtitle>وصف مختصر للمنشور</IonCardSubtitle>
-                                </IonCardHeader>
-                                <IonCardContent>
-                                    هذا نص تجريبي لمحتوى المنشور. سيتم استبداله بمحتوى حقيقي من
-                                    API.
-                                </IonCardContent>
-                            </IonCard>
-                        </IonCol>
+                            ))
+                        }
 
-                        <IonCol size="12" sizeMd="6">
-                            <IonCard routerLink="/tabs/posts/2">
-                                <IonImg
-                                    src="https://picsum.photos/400/300?random=2"
-                                    alt="منشور تجريبي"
-                                />
-                                <IonCardHeader>
-                                    <div className="post-author">
-                                        <IonAvatar>
-                                            <IonImg src="https://i.pravatar.cc/100?img=2" />
-                                        </IonAvatar>
-                                        <div className="author-info">
-                                            <IonText>
-                                                <p className="author-name">فاطمة علي</p>
-                                            </IonText>
-                                            <IonText color="medium">
-                                                <p className="post-time">منذ 5 ساعات</p>
-                                            </IonText>
-                                        </div>
-                                    </div>
-                                    <IonCardTitle>منشور تجريبي رقم 2</IonCardTitle>
-                                    <IonCardSubtitle>وصف مختصر للمنشور</IonCardSubtitle>
-                                </IonCardHeader>
-                                <IonCardContent>
-                                    هذا نص تجريبي لمحتوى المنشور. سيتم استبداله بمحتوى حقيقي من
-                                    API.
-                                </IonCardContent>
-                            </IonCard>
-                        </IonCol>
+                        {/* ─── حالة فارغة ─── */}
+                        {!loading && posts.length === 0 && (
+                            <IonCol size="12" sizeMd="6" offsetMd="3">
+                                <IonCard className="ion-padding ion-text-center">
+                                    <IonCardTitle color="primary">
+                                        لا توجد منشورات لعرضها
+                                    </IonCardTitle>
+                                    <IonText color="medium">
+                                        <p>اسحب للأسفل لإعادة المحاولة</p>
+                                    </IonText>
+                                </IonCard>
+                            </IonCol>
+                        )}
                     </IonRow>
                 </IonGrid>
+
+                {/* ─── Infinite Scroll ─── */}
+                <IonInfiniteScroll
+                    disabled={currentPage >= totalPages}
+                    onIonInfinite={handleInfinite}
+                    threshold="200px"
+                >
+                    <IonInfiniteScrollContent loadingText="جار تحميل المزيد..." />
+                </IonInfiniteScroll>
             </IonContent>
         </IonPage>
     );

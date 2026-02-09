@@ -30,6 +30,11 @@ router.put('/profile/image',
   controller.updateImage
 );
 
+router.put('/profile/image/reset',
+  middleware.isAuthenticated,
+  controller.resetImage
+);
+
 router.put('/profile/info',
   middleware.isAuthenticated,
   validator.updateInfo,

@@ -121,6 +121,49 @@ const updateImage = async (req, res) => {
     }
 };
 
+const resetImage = async (req, res) => {
+    try {
+        const userId = req.currentUser?.id;
+        if (!userId) {
+            return res.status(401).json({ message: "غير مصرح" });
+        }
+
+        const user = await models.User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: "المستخدم غير موجود" });
+        }
+
+        const previousImageUrl = user.ImageUrl;
+        const newImageUrl = `/images/${DEFAULT_PROFILE_IMAGE}`;
+
+        await user.update({ ImageUrl: newImageUrl });
+
+        const sanitizeUser = user.toJSON();
+        delete sanitizeUser.password;
+
+        try {
+            const oldFileName = extractFileName(previousImageUrl);
+            if (oldFileName && oldFileName !== DEFAULT_PROFILE_IMAGE) {
+                const imagesRoot = path.resolve(process.cwd(), imgDirectory);
+                const oldFilePath = path.join(imagesRoot, oldFileName);
+
+                await fs.promises.unlink(oldFilePath).catch((err) => {
+                    if (err?.code !== 'ENOENT') {
+                        console.error('Failed to delete old profile picture:', err.message);
+                    }
+                });
+            }
+        } catch (err) {
+            console.error('Error while cleaning old profile picture:', err?.message || err);
+        }
+
+        return res.status(200).json({ message: "تمت إعادة الصورة الافتراضية بنجاح", user: sanitizeUser });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "خطأ في الخادم" });
+    }
+};
+
 const updateInfo = async (req, res) => {
     try {
         const userId = req.currentUser?.id;
@@ -230,4 +273,4 @@ const deleteUser = async (req, res) => {
     }
 };
 
-export { register, login, getProfile, updateImage, updateInfo, deleteUser };
+export { register, login, getProfile, updateImage, resetImage, updateInfo, deleteUser };

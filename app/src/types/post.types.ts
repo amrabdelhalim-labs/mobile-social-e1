@@ -1,0 +1,56 @@
+/**
+ * أنواع TypeScript الخاصة بالمنشورات
+ * مطابقة لما يرجعه السيرفر في controllers/post.controller.js
+ *
+ * السيرفر يُرجع:
+ * - getAllPosts / getMyPosts → { posts: Post[], pagination: Pagination }
+ * - كل منشور يحتوي على: User, Post_Images[], Comments[] (ids فقط), likesCount, isLiked
+ */
+
+import type { UserBasic } from './user.types';
+
+// إعادة تصدير لسهولة الاستخدام
+export type PostUser = UserBasic;
+
+/** صورة مرفقة بالمنشور */
+export interface PostImage {
+    id: number;
+    imageUrl: string;
+}
+
+/** تعليق مختصر (id فقط — يُستخدم لحساب العدد في القوائم) */
+export interface PostCommentRef {
+    id: number;
+}
+
+/** المنشور كما يرجعه السيرفر في قوائم getAllPosts / getMyPosts */
+export interface Post {
+    id: number;
+    title: string;
+    content: string;
+    steps: string[] | null;
+    country: string | null;
+    region: string | null;
+    createdAt: string;
+    updatedAt: string;
+    UserId: number;
+    User: PostUser;
+    Post_Images: PostImage[];
+    Comments: PostCommentRef[];
+    likesCount: number;
+    isLiked: boolean;
+}
+
+/** بيانات التصفّح (Pagination) المرجعة من السيرفر */
+export interface Pagination {
+    currentPage: number;
+    totalPages: number;
+    totalPosts: number;
+    limit: number;
+}
+
+/** الاستجابة الكاملة لـ getAllPosts / getMyPosts */
+export interface PostsResponse {
+    posts: Post[];
+    pagination: Pagination;
+}
