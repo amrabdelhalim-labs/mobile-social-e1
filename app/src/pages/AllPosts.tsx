@@ -30,12 +30,14 @@ import {
     IonRefresherContent,
     IonRow,
     IonText,
+    useIonViewWillEnter,
 } from '@ionic/react';
 import Header from '../components/Header/Header';
 import PostCard from '../components/PostCard/PostCard';
 import api from '../config/axios';
 import { GET_ALL_POSTS } from '../config/urls';
 import type { Post, PostsResponse } from '../types/post.types';
+import { onPostsChanged } from '../utils/postsEvents';
 import './AllPosts.css';
 
 const AllPosts: React.FC = () => {
@@ -76,9 +78,16 @@ const AllPosts: React.FC = () => {
         }
     }, []);
 
-    // الجلب الأولي عند فتح الصفحة
-    useEffect(() => {
+    // جلب البيانات عند دخول الصفحة (وأيضًا عند الرجوع إليها)
+    useIonViewWillEnter(() => {
         fetchPosts(1, true);
+    });
+
+    // تحديث تلقائي عند حدوث أي تغيير في المنشورات
+    useEffect(() => {
+        return onPostsChanged(() => {
+            fetchPosts(1, true);
+        });
     }, [fetchPosts]);
 
     /** Pull-to-refresh: إعادة تحميل من الصفحة الأولى */

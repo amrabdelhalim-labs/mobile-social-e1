@@ -23,6 +23,16 @@ export interface PostCommentRef {
     id: number;
 }
 
+/** تعليق كامل كما يرجعه السيرفر في getPostById */
+export interface PostComment {
+    id: number;
+    text: string;
+    createdAt: string;
+    UserId: number;
+    PostId: number;
+    User: PostUser;
+}
+
 /** المنشور كما يرجعه السيرفر في قوائم getAllPosts / getMyPosts */
 export interface Post {
     id: number;
@@ -39,6 +49,11 @@ export interface Post {
     Comments: PostCommentRef[];
     likesCount: number;
     isLiked: boolean;
+}
+
+/** المنشور الكامل كما يرجعه السيرفر في getPostById (التعليقات كاملة) */
+export interface PostDetail extends Omit<Post, 'Comments'> {
+    Comments: PostComment[];
 }
 
 /** بيانات التصفّح (Pagination) المرجعة من السيرفر */

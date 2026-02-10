@@ -37,6 +37,7 @@ import {
     IonRefresherContent,
     IonRow,
     IonText,
+    useIonViewWillEnter,
 } from '@ionic/react';
 import {
     eyeOutline,
@@ -50,6 +51,8 @@ import PostCard from '../components/PostCard/PostCard';
 import api from '../config/axios';
 import { GET_MY_POSTS, DELETE_POST } from '../config/urls';
 import type { Post, PostsResponse } from '../types/post.types';
+import { onPostsChanged, emitPostsChanged } from '../utils/postsEvents';
+
 
 const MyPosts: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -96,8 +99,16 @@ const MyPosts: React.FC = () => {
         }
     }, []);
 
-    useEffect(() => {
+    // جلب البيانات عند دخول الصفحة (وأيضًا عند الرجوع إليها)
+    useIonViewWillEnter(() => {
         fetchPosts(1, true);
+    });
+
+    // تحديث تلقائي عند حدوث أي تغيير في المنشورات
+    useEffect(() => {
+        return onPostsChanged(() => {
+            fetchPosts(1, true);
+        });
     }, [fetchPosts]);
 
     /** Pull-to-refresh */
@@ -133,6 +144,7 @@ const MyPosts: React.FC = () => {
             await api.delete(DELETE_POST(selectedPost.id));
             // إزالة المنشور من القائمة محليًا بدون إعادة جلب
             setPosts((prev) => prev.filter((p) => p.id !== selectedPost.id));
+            emitPostsChanged();
         } catch (error) {
             console.error('فشل حذف المنشور:', error);
         } finally {

@@ -10,6 +10,11 @@
     object-fit: cover;
 }
 
+/* ─── صف الرأس (المؤلف/التاريخ + الإحصائيات + الخيارات) ─── */
+.post-card-header {
+    margin-bottom: 10px;
+}
+
 /* ─── بيانات المؤلف ─── */
 .post-card-author {
     display: flex;
@@ -37,11 +42,19 @@
     font-size: 0.75rem;
 }
 
+/* ─── الإجراءات (الإحصائيات + الخيارات) ─── */
+.post-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 /* ─── زر الخيارات ─── */
 .post-card-options-btn {
     --padding-start: 4px;
     --padding-end: 4px;
     margin: 0;
+    margin-inline-start: 4px;
 }
 
 /* ─── العنوان والوصف ─── */
@@ -65,10 +78,7 @@
 .post-card-stats {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-top: 12px;
-    padding-top: 8px;
-    border-top: 1px solid var(--ion-color-light-shade, #e0e0e0);
+    gap: 12px;
 }
 
 .post-card-stat {

@@ -83,52 +83,76 @@ const PostCard: React.FC<PostCardProps> = ({
 
                 <IonCardContent>
                     <IonGrid className="ion-no-padding">
-                        {/* ─── صف المؤلف + زر الخيارات ─── */}
-                        <IonRow className="ion-align-items-center ion-justify-content-between">
-                            {showAuthor && post.User && (
-                                <div className="post-card-author">
-                                    <IonAvatar className="post-card-avatar">
-                                        <IonImg
-                                            src={getProfileImageUrl(post.User.ImageUrl)}
-                                            alt={post.User.name}
-                                        />
-                                    </IonAvatar>
-                                    <div className="post-card-author-info">
-                                        <IonText className="post-card-author-name">
-                                            {post.User.name}
-                                        </IonText>
-                                        <IonText color="medium" className="post-card-time">
-                                            {moment(post.createdAt).fromNow()}
-                                        </IonText>
+                        {/* ─── صف المعلومات: المؤلف/التاريخ | الإحصائيات | الخيارات ─── */}
+                        <IonRow className="ion-align-items-center ion-justify-content-between post-card-header">
+                            {/* الجزء الأيسر: معلومات المؤلف أو التاريخ */}
+                            <IonCol size="auto" className="ion-no-padding">
+                                {showAuthor && post.User && (
+                                    <div className="post-card-author">
+                                        <IonAvatar className="post-card-avatar">
+                                            <IonImg
+                                                src={getProfileImageUrl(post.User.ImageUrl)}
+                                                alt={post.User.name}
+                                            />
+                                        </IonAvatar>
+                                        <div className="post-card-author-info">
+                                            <IonText className="post-card-author-name">
+                                                {post.User.name}
+                                            </IonText>
+                                            <IonText color="medium" className="post-card-time">
+                                                {moment(post.createdAt).fromNow()}
+                                            </IonText>
+                                        </div>
                                     </div>
+                                )}
+
+                                {/* في MyPosts: فقط التاريخ */}
+                                {!showAuthor && (
+                                    <IonText color="medium" className="post-card-time">
+                                        {moment(post.createdAt).fromNow()}
+                                    </IonText>
+                                )}
+                            </IonCol>
+
+                            {/* الجزء الأيمن: الإحصائيات والخيارات */}
+                            <IonCol size="auto" className="ion-no-padding">
+                                <div className="post-card-actions">
+                                    {/* الإحصائيات */}
+                                    <div className="post-card-stats">
+                                        <div className="post-card-stat">
+                                            <IonIcon
+                                                icon={post.isLiked ? heart : heartOutline}
+                                                color={post.isLiked ? 'danger' : 'medium'}
+                                            />
+                                            <IonText color="medium">{likesCount}</IonText>
+                                        </div>
+                                        <div className="post-card-stat">
+                                            <IonIcon icon={chatbubbleOutline} color="medium" />
+                                            <IonText color="medium">{commentsCount}</IonText>
+                                        </div>
+                                    </div>
+
+                                    {/* زر الخيارات (فقط في MyPosts) */}
+                                    {onOptions && (
+                                        <IonButton
+                                            fill="clear"
+                                            size="small"
+                                            className="post-card-options-btn"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                e.preventDefault();
+                                                onOptions(post);
+                                            }}
+                                        >
+                                            <IonIcon
+                                                icon={ellipsisVertical}
+                                                slot="icon-only"
+                                                color="medium"
+                                            />
+                                        </IonButton>
+                                    )}
                                 </div>
-                            )}
-
-                            {/* في MyPosts: لا نعرض المؤلف لكن نعرض الوقت */}
-                            {!showAuthor && (
-                                <IonText color="medium" className="post-card-time">
-                                    {moment(post.createdAt).fromNow()}
-                                </IonText>
-                            )}
-
-                            {onOptions && (
-                                <IonButton
-                                    fill="clear"
-                                    size="small"
-                                    className="post-card-options-btn"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        e.preventDefault();
-                                        onOptions(post);
-                                    }}
-                                >
-                                    <IonIcon
-                                        icon={ellipsisVertical}
-                                        slot="icon-only"
-                                        color="medium"
-                                    />
-                                </IonButton>
-                            )}
+                            </IonCol>
                         </IonRow>
 
                         {/* ─── العنوان والوصف ─── */}
@@ -138,21 +162,6 @@ const PostCard: React.FC<PostCardProps> = ({
                         <IonCardSubtitle className="post-card-content">
                             {post.content}
                         </IonCardSubtitle>
-
-                        {/* ─── شريط الإحصائيات (تعليقات + إعجابات) ─── */}
-                        <IonRow className="post-card-stats">
-                            <div className="post-card-stat">
-                                <IonIcon
-                                    icon={post.isLiked ? heart : heartOutline}
-                                    color={post.isLiked ? 'danger' : 'medium'}
-                                />
-                                <IonText color="medium">{likesCount}</IonText>
-                            </div>
-                            <div className="post-card-stat">
-                                <IonIcon icon={chatbubbleOutline} color="medium" />
-                                <IonText color="medium">{commentsCount}</IonText>
-                            </div>
-                        </IonRow>
                     </IonGrid>
                 </IonCardContent>
             </IonCard>
