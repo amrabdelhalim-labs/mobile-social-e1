@@ -10,6 +10,9 @@ export default defineConfig({
     react(),
     legacy()
   ],
+  define: {
+    global: 'window',
+  },
   test: {
     globals: true,
     environment: 'jsdom',

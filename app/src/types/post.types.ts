@@ -5,8 +5,14 @@
  * السيرفر يُرجع:
  * - getAllPosts / getMyPosts → { posts: Post[], pagination: Pagination }
  * - كل منشور يحتوي على: User, Post_Images[], Comments[] (ids فقط), likesCount, isLiked
+ *
+ * ملاحظة عن steps:
+ * - المنشورات القديمة: steps = string[] (مصفوفة نصوص)
+ * - المنشورات الجديدة: steps = RawDraftContentState (كائن Draft.js)
+ * - يُحدد النوع تلقائياً عند العرض عبر فحص وجود خاصية 'blocks'
  */
 
+import type { RawDraftContentState } from 'draft-js';
 import type { UserBasic } from './user.types';
 
 // إعادة تصدير لسهولة الاستخدام
@@ -33,12 +39,19 @@ export interface PostComment {
     User: PostUser;
 }
 
+/**
+ * خطوات التحضير — يمكن أن تكون:
+ *  - مصفوفة نصوص (المنشورات القديمة)
+ *  - كائن Draft.js RawDraftContentState (المنشورات الجديدة)
+ */
+export type PostSteps = string[] | RawDraftContentState;
+
 /** المنشور كما يرجعه السيرفر في قوائم getAllPosts / getMyPosts */
 export interface Post {
     id: number;
     title: string;
     content: string;
-    steps: string[] | null;
+    steps: PostSteps | null;
     country: string | null;
     region: string | null;
     createdAt: string;

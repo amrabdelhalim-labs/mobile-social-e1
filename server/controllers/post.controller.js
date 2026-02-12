@@ -26,7 +26,12 @@ const newPost = async (req, res) => {
             return res.status(400).json({ message: "المحتوى مطلوب" });
         }
 
-        // معالجة الخطوات (steps) - يمكن أن تكون JSON string أو array
+        // التحقق من وجود صورة واحدة على الأقل (إجباري)
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: "يجب إرفاق صورة واحدة على الأقل" });
+        }
+
+        // معالجة الخطوات (steps) - يمكن أن تكون JSON string أو array أو كائن Draft.js
         let parsedSteps = null;
         if (steps !== undefined && steps !== null && steps !== '') {
             if (typeof steps === 'string') {
@@ -35,15 +40,15 @@ const newPost = async (req, res) => {
                 } catch {
                     return res.status(400).json({ message: "صيغة الخطوات غير صحيحة" });
                 }
-            } else if (Array.isArray(steps)) {
+            } else if (Array.isArray(steps) || (typeof steps === 'object' && steps !== null)) {
                 parsedSteps = steps;
             } else {
-                return res.status(400).json({ message: "الخطوات يجب أن تكون مصفوفة" });
+                return res.status(400).json({ message: "الخطوات يجب أن تكون بصيغة صحيحة" });
             }
 
-            // التحقق من أن كل عنصر في الخطوات صالح
-            if (!Array.isArray(parsedSteps)) {
-                return res.status(400).json({ message: "الخطوات يجب أن تكون مصفوفة" });
+            // التحقق من أن الخطوات إما مصفوفة أو كائن Draft.js (يحتوي على blocks)
+            if (!Array.isArray(parsedSteps) && (typeof parsedSteps !== 'object' || parsedSteps === null)) {
+                return res.status(400).json({ message: "الخطوات يجب أن تكون بصيغة صحيحة" });
             }
         }
 
@@ -388,17 +393,17 @@ const updatePost = async (req, res) => {
             } else if (typeof steps === 'string') {
                 try {
                     const parsed = JSON.parse(steps);
-                    if (!Array.isArray(parsed)) {
-                        return res.status(400).json({ message: "الخطوات يجب أن تكون مصفوفة" });
+                    if (!Array.isArray(parsed) && (typeof parsed !== 'object' || parsed === null)) {
+                        return res.status(400).json({ message: "الخطوات يجب أن تكون بصيغة صحيحة" });
                     }
                     updates.steps = parsed;
                 } catch {
                     return res.status(400).json({ message: "صيغة الخطوات غير صحيحة" });
                 }
-            } else if (Array.isArray(steps)) {
+            } else if (Array.isArray(steps) || (typeof steps === 'object' && steps !== null)) {
                 updates.steps = steps;
             } else {
-                return res.status(400).json({ message: "الخطوات يجب أن تكون مصفوفة" });
+                return res.status(400).json({ message: "الخطوات يجب أن تكون بصيغة صحيحة" });
             }
         }
 

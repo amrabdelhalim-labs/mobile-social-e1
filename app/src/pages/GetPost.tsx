@@ -33,12 +33,14 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import moment from 'moment';
-import { useState, useEffect, useCallback, useContext } from 'react';
+import { useState, useEffect, useCallback, useContext, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
+import type { RawDraftContentState } from 'draft-js';
+import draftToHtml from 'draftjs-to-html';
 import api from '../config/axios';
 import { GET_POST_BY_ID, DELETE_COMMENT } from '../config/urls';
 import { AuthContext } from '../context/AuthContext';
-import type { PostDetail, PostComment } from '../types/post.types';
+import type { PostDetail, PostComment, PostSteps } from '../types/post.types';
 import Header from '../components/Header/Header';
 import Like from '../components/Like/Like';
 import GetComment from '../components/Comment/GetComment';
@@ -47,6 +49,20 @@ import { emitPostsChanged } from '../utils/postsEvents';
 import './GetPost.css';
 
 type RouteParams = { id: string };
+
+/**
+ * فحص ما إذا كان steps عبارة عن كائن Draft.js RawDraftContentState
+ * يتحقق من وجود خاصية 'blocks' كمصفوفة
+ */
+const isDraftContentState = (steps: PostSteps): steps is RawDraftContentState => {
+	return (
+		typeof steps === 'object' &&
+		!Array.isArray(steps) &&
+		steps !== null &&
+		'blocks' in steps &&
+		Array.isArray((steps as RawDraftContentState).blocks)
+	);
+};
 
 const GetPost: React.FC = () => {
 	const { id } = useParams<RouteParams>();
@@ -82,6 +98,27 @@ const GetPost: React.FC = () => {
 	useEffect(() => {
 		fetchPost();
 	}, [fetchPost]);
+
+	// ─── تحويل خطوات التحضير إلى HTML أو مصفوفة نصوص ───
+	const stepsContent = useMemo(() => {
+		if (!post?.steps) return null;
+
+		// كائن Draft.js → تحويل إلى HTML
+		if (isDraftContentState(post.steps)) {
+			try {
+				return { type: 'html' as const, html: draftToHtml(post.steps) };
+			} catch {
+				return null;
+			}
+		}
+
+		// مصفوفة نصوص (منشورات قديمة)
+		if (Array.isArray(post.steps) && post.steps.length > 0) {
+			return { type: 'list' as const, items: post.steps };
+		}
+
+		return null;
+	}, [post?.steps]);
 
 	// ─── تبديل عرض التعليقات ───
 	const toggleComments = useCallback(() => {
@@ -246,18 +283,25 @@ const GetPost: React.FC = () => {
 										</div>
 
 										{/* خطوات التحضير */}
-										{post.steps && post.steps.length > 0 && (
+										{stepsContent && (
 											<div className="get-post-section">
 												<IonText color="primary">
 													<h3 className="get-post-section-title">خطوات التحضير</h3>
 												</IonText>
-												<ol className="get-post-steps">
-													{post.steps.map((step, idx) => (
-														<li key={idx}>
-															<IonText>{step}</IonText>
-														</li>
-													))}
-												</ol>
+												{stepsContent.type === 'html' ? (
+													<div
+														className="get-post-steps-html"
+														dangerouslySetInnerHTML={{ __html: stepsContent.html }}
+													/>
+												) : (
+													<ol className="get-post-steps">
+														{stepsContent.items.map((step, idx) => (
+															<li key={idx}>
+																<IonText>{step}</IonText>
+															</li>
+														))}
+													</ol>
+												)}
 											</div>
 										)}
 									</div>

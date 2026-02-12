@@ -17,14 +17,16 @@ const newPost = [
             if (typeof value === 'string') {
                 try {
                     const parsed = JSON.parse(value);
-                    if (!Array.isArray(parsed)) {
-                        throw new Error('الخطوات يجب أن تكون مصفوفة');
+                    // يقبل مصفوفة أو كائن Draft.js (يحتوي على blocks)
+                    if (!Array.isArray(parsed) && (typeof parsed !== 'object' || parsed === null)) {
+                        throw new Error('الخطوات يجب أن تكون بصيغة صحيحة');
                     }
-                } catch {
+                } catch (e) {
+                    if (e.message === 'الخطوات يجب أن تكون بصيغة صحيحة') throw e;
                     throw new Error('صيغة الخطوات غير صحيحة');
                 }
-            } else if (value !== undefined && value !== null && !Array.isArray(value)) {
-                throw new Error('الخطوات يجب أن تكون مصفوفة');
+            } else if (value !== undefined && value !== null && !Array.isArray(value) && typeof value !== 'object') {
+                throw new Error('الخطوات يجب أن تكون بصيغة صحيحة');
             }
             return true;
         }),
@@ -57,14 +59,15 @@ const updatePost = [
             if (typeof value === 'string') {
                 try {
                     const parsed = JSON.parse(value);
-                    if (!Array.isArray(parsed)) {
-                        throw new Error('الخطوات يجب أن تكون مصفوفة');
+                    if (!Array.isArray(parsed) && (typeof parsed !== 'object' || parsed === null)) {
+                        throw new Error('الخطوات يجب أن تكون بصيغة صحيحة');
                     }
-                } catch {
+                } catch (e) {
+                    if (e.message === 'الخطوات يجب أن تكون بصيغة صحيحة') throw e;
                     throw new Error('صيغة الخطوات غير صحيحة');
                 }
-            } else if (value !== undefined && value !== null && !Array.isArray(value)) {
-                throw new Error('الخطوات يجب أن تكون مصفوفة');
+            } else if (value !== undefined && value !== null && !Array.isArray(value) && typeof value !== 'object') {
+                throw new Error('الخطوات يجب أن تكون بصيغة صحيحة');
             }
             return true;
         }),
