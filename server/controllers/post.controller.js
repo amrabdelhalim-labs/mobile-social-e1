@@ -1,5 +1,5 @@
 import models from "../models/index.js";
-import { imgDirectory, extractFileName } from "../utilities/files.js";
+import { imagesRoot, extractFileName } from "../utilities/files.js";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -100,7 +100,7 @@ const newPost = async (req, res) => {
         // حذف الصور المرفوعة في حالة حدوث خطأ
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
-                const filePath = path.resolve(process.cwd(), imgDirectory, file.filename);
+                const filePath = path.join(imagesRoot, file.filename);
                 fs.promises.unlink(filePath).catch((err) => {
                     if (err?.code !== 'ENOENT') {
                         console.error('Failed to delete uploaded image:', err.message);
@@ -436,7 +436,7 @@ const updatePost = async (req, res) => {
                 for (const img of existingImages) {
                     const fileName = extractFileName(img.imageUrl);
                     if (fileName) {
-                        const filePath = path.resolve(process.cwd(), imgDirectory, fileName);
+                        const filePath = path.join(imagesRoot, fileName);
 
                         await fs.promises.unlink(filePath).catch((err) => {
                             if (err?.code !== 'ENOENT') {
@@ -494,7 +494,7 @@ const updatePost = async (req, res) => {
 
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
-                const filePath = path.resolve(process.cwd(), imgDirectory, file.filename);
+                const filePath = path.join(imagesRoot, file.filename);
                 fs.promises.unlink(filePath).catch((err) => {
                     if (err?.code !== 'ENOENT') {
                         console.error('Failed to delete uploaded image:', err.message);
@@ -535,7 +535,7 @@ const deletePost = async (req, res) => {
             for (const img of post.Post_Images) {
                 const fileName = extractFileName(img.imageUrl);
                 if (fileName) {
-                    const filePath = path.resolve(process.cwd(), imgDirectory, fileName);
+                    const filePath = path.join(imagesRoot, fileName);
 
                     await fs.promises.unlink(filePath).catch((err) => {
                         if (err?.code !== 'ENOENT') {

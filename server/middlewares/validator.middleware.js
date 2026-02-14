@@ -1,7 +1,7 @@
 import { validationResult } from "express-validator";
 import fs from "node:fs";
 import path from "node:path";
-import { imgDirectory } from "../utilities/files.js";
+import { imagesRoot } from "../utilities/files.js";
 
 const validateRequest = (req, res, next) => {
     const errors = validationResult(req);
@@ -15,7 +15,6 @@ const validateRequest = (req, res, next) => {
         }
 
         if (files.length > 0) {
-            const imagesRoot = path.resolve(process.cwd(), imgDirectory);
             for (const file of files) {
                 const filePath = path.join(imagesRoot, file.filename);
                 fs.promises.unlink(filePath).catch((err) => {

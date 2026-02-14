@@ -1,7 +1,7 @@
 import models from "../models/index.js";
 import bcrypt from "bcrypt";
 import * as jwt from "../utilities/jwt.js";
-import { imgDirectory, extractFileName } from "../utilities/files.js";
+import { imagesRoot, extractFileName } from "../utilities/files.js";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -101,7 +101,6 @@ const updateImage = async (req, res) => {
         try {
             const oldFileName = extractFileName(previousImageUrl);
             if (oldFileName && oldFileName !== req.file.filename && oldFileName !== DEFAULT_PROFILE_IMAGE) {
-                const imagesRoot = path.resolve(process.cwd(), imgDirectory);
                 const oldFilePath = path.join(imagesRoot, oldFileName);
 
                 await fs.promises.unlink(oldFilePath).catch((err) => {
@@ -144,7 +143,6 @@ const resetImage = async (req, res) => {
         try {
             const oldFileName = extractFileName(previousImageUrl);
             if (oldFileName && oldFileName !== DEFAULT_PROFILE_IMAGE) {
-                const imagesRoot = path.resolve(process.cwd(), imgDirectory);
                 const oldFilePath = path.join(imagesRoot, oldFileName);
 
                 await fs.promises.unlink(oldFilePath).catch((err) => {
@@ -255,7 +253,6 @@ const deleteUser = async (req, res) => {
         await user.destroy();
 
         // تنظيف الملفات من القرص
-        const imagesRoot = path.resolve(process.cwd(), imgDirectory);
         for (const fileName of filesToDelete) {
             try {
                 await fs.promises.unlink(path.join(imagesRoot, fileName));

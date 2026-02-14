@@ -2,17 +2,20 @@ import 'dotenv/config';
 import express from 'express';
 import router from './routes/index.js';
 import cors from 'cors';
-import morgan from 'morgan';
 import db from './utilities/database.js';
+import { imagesRoot } from './utilities/files.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') {
+  const { default: morgan } = await import('morgan');
+  app.use(morgan('dev'));
+}
 app.use(express.json({ limit: '1mb' }));
 app.use('/', router);
-app.use('/images', express.static('public/images'));
+app.use('/images', express.static(imagesRoot));
 
 // Health check route
 app.get('/health', (req, res) => {
