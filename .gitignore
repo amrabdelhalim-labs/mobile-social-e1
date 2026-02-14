@@ -1,6 +1,13 @@
 /server/public
 !/server/public/default-profile.svg
 
+# App build outputs (built by CI/CD)
+app/dist/
+app/build/
+app/ios/
+app/android/
+app/.capacitor/
+
 # Logs
 logs
 *.log
