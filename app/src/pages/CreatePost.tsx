@@ -255,9 +255,9 @@ const CreatePost: FC = () => {
             <Header title="إنشاء منشور" />
 
             <IonContent className="ion-padding create-post-content">
-                <IonGrid>
+                <IonGrid className="form-container">
                     <IonRow className="ion-justify-content-center">
-                        <IonCol sizeMd="8" sizeLg="6">
+                        <IonCol size="12" sizeMd="10" sizeLg="8" sizeXl="6">
                             <IonList className="create-post-list">
                                 {/* ═══ العنوان ═══ */}
                                 <IonItem>

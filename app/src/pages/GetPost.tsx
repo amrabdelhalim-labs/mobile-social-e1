@@ -186,142 +186,146 @@ const GetPost: React.FC = () => {
 
 				{/* ═══ محتوى المنشور ═══ */}
 				{!isLoading && post && (
-					<>
-						{/* ─── سلايدر الصور ─── */}
-						<Swiper
-							className="get-post-swiper"
-							modules={[Pagination, Navigation]}
-							pagination={{ clickable: true }}
-							navigation
-							loop={images.length > 1}
-						>
-							{images.map((src, index) => (
-								<SwiperSlide key={index}>
-									<IonImg src={src} alt={`${post.title} - ${index + 1}`} />
-								</SwiperSlide>
-							))}
-						</Swiper>
+					<IonGrid className="get-post-container">
+						<IonRow className="ion-justify-content-center">
+							<IonCol size="12" sizeLg="10" sizeXl="8">
+								{/* ─── سلايدر الصور ─── */}
+								<Swiper
+									className="get-post-swiper"
+									modules={[Pagination, Navigation]}
+									pagination={{ clickable: true }}
+									navigation
+									loop={images.length > 1}
+								>
+									{images.map((src, index) => (
+										<SwiperSlide key={index}>
+											<IonImg src={src} alt={`${post.title} - ${index + 1}`} />
+										</SwiperSlide>
+									))}
+								</Swiper>
 
-						<div className="ion-padding get-post-body">
-							<IonGrid className="ion-no-padding">
-								{/* ─── معلومات المؤلف ─── */}
-								<IonRow className="ion-align-items-center get-post-author-row">
-									<IonCol size="auto" className="ion-no-padding">
-										<div className="get-post-author">
-											<IonAvatar className="get-post-avatar">
-												<IonImg
-													src={getProfileImageUrl(post.User?.ImageUrl)}
-													alt={post.User?.name}
+								<div className="ion-padding get-post-body">
+									<IonGrid className="ion-no-padding">
+										{/* ─── معلومات المؤلف ─── */}
+										<IonRow className="ion-align-items-center get-post-author-row">
+											<IonCol size="auto" className="ion-no-padding">
+												<div className="get-post-author">
+													<IonAvatar className="get-post-avatar">
+														<IonImg
+															src={getProfileImageUrl(post.User?.ImageUrl)}
+															alt={post.User?.name}
+														/>
+													</IonAvatar>
+													<div className="get-post-author-info">
+														<IonText className="get-post-author-name">
+															{post.User?.name}
+														</IonText>
+														<IonText color="medium" className="get-post-time">
+															{moment(post.createdAt).fromNow()}
+														</IonText>
+													</div>
+												</div>
+											</IonCol>
+										</IonRow>
+
+										{/* ─── أزرار التفاعل ─── */}
+										<IonRow className="get-post-actions">
+											<IonCol size="auto" className="ion-no-padding">
+												<Like
+													postId={post.id}
+													initialLiked={post.isLiked}
+													initialCount={post.likesCount}
 												/>
-											</IonAvatar>
-											<div className="get-post-author-info">
-												<IonText className="get-post-author-name">
-													{post.User?.name}
-												</IonText>
-												<IonText color="medium" className="get-post-time">
-													{moment(post.createdAt).fromNow()}
-												</IonText>
-											</div>
-										</div>
-									</IonCol>
-								</IonRow>
-
-								{/* ─── أزرار التفاعل ─── */}
-								<IonRow className="get-post-actions">
-									<IonCol size="auto" className="ion-no-padding">
-										<Like
-											postId={post.id}
-											initialLiked={post.isLiked}
-											initialCount={post.likesCount}
-										/>
-									</IonCol>
-									<IonCol size="auto" className="ion-no-padding">
-										<IonButton
-											fill="clear"
-											size="small"
-											className={`comment-toggle-btn ${showComments ? 'active' : ''}`}
-											onClick={toggleComments}
-										>
-											<IonIcon
-												icon={showComments ? chatbubble : chatbubbleOutline}
-												color={showComments ? 'primary' : 'medium'}
-												slot="start"
-											/>
-											<IonText color={showComments ? 'primary' : 'medium'}>
-												{comments.length}
-											</IonText>
-										</IonButton>
-									</IonCol>
-								</IonRow>
-
-								{/* ─── المحتوى أو التعليقات (حسب التبديل) ─── */}
-								{!showComments ? (
-									<div className="get-post-content-section">
-										{/* العنوان */}
-										<IonText color="dark">
-											<h2 className="get-post-title">{post.title}</h2>
-										</IonText>
-
-										{/* الموقع */}
-										{(post.country || post.region) && (
-											<IonChip className="get-post-location" color="medium" outline>
-												<IonIcon icon={locationOutline} />
-												<span>
-													{[post.country, post.region].filter(Boolean).join(' - ')}
-												</span>
-											</IonChip>
-										)}
-
-										{/* المكونات */}
-										<div className="get-post-section">
-											<IonText color="primary">
-												<h3 className="get-post-section-title">المكوّنات</h3>
-											</IonText>
-											<IonText>
-												<p className="get-post-text">{post.content}</p>
-											</IonText>
-										</div>
-
-										{/* خطوات التحضير */}
-										{stepsContent && (
-											<div className="get-post-section">
-												<IonText color="primary">
-													<h3 className="get-post-section-title">خطوات التحضير</h3>
-												</IonText>
-												{stepsContent.type === 'html' ? (
-													<div
-														className="get-post-steps-html"
-														dangerouslySetInnerHTML={{ __html: stepsContent.html }}
+											</IonCol>
+											<IonCol size="auto" className="ion-no-padding">
+												<IonButton
+													fill="clear"
+													size="small"
+													className={`comment-toggle-btn ${showComments ? 'active' : ''}`}
+													onClick={toggleComments}
+												>
+													<IonIcon
+														icon={showComments ? chatbubble : chatbubbleOutline}
+														color={showComments ? 'primary' : 'medium'}
+														slot="start"
 													/>
-												) : (
-													<ol className="get-post-steps">
-														{stepsContent.items.map((step, idx) => (
-															<li key={idx}>
-																<IonText>{step}</IonText>
-															</li>
-														))}
-													</ol>
+													<IonText color={showComments ? 'primary' : 'medium'}>
+														{comments.length}
+													</IonText>
+												</IonButton>
+											</IonCol>
+										</IonRow>
+
+										{/* ─── المحتوى أو التعليقات (حسب التبديل) ─── */}
+										{!showComments ? (
+											<div className="get-post-content-section">
+												{/* العنوان */}
+												<IonText color="dark">
+													<h2 className="get-post-title">{post.title}</h2>
+												</IonText>
+
+												{/* الموقع */}
+												{(post.country || post.region) && (
+													<IonChip className="get-post-location" color="medium" outline>
+														<IonIcon icon={locationOutline} />
+														<span>
+															{[post.country, post.region].filter(Boolean).join(' - ')}
+														</span>
+													</IonChip>
+												)}
+
+												{/* المكونات */}
+												<div className="get-post-section">
+													<IonText color="primary">
+														<h3 className="get-post-section-title">المكوّنات</h3>
+													</IonText>
+													<IonText>
+														<p className="get-post-text">{post.content}</p>
+													</IonText>
+												</div>
+
+												{/* خطوات التحضير */}
+												{stepsContent && (
+													<div className="get-post-section">
+														<IonText color="primary">
+															<h3 className="get-post-section-title">خطوات التحضير</h3>
+														</IonText>
+														{stepsContent.type === 'html' ? (
+															<div
+																className="get-post-steps-html"
+																dangerouslySetInnerHTML={{ __html: stepsContent.html }}
+															/>
+														) : (
+															<ol className="get-post-steps">
+																{stepsContent.items.map((step, idx) => (
+																	<li key={idx}>
+																		<IonText>{step}</IonText>
+																	</li>
+																))}
+															</ol>
+														)}
+													</div>
 												)}
 											</div>
+										) : (
+											<div className="get-post-comments-section">
+												<GetComment
+													comments={comments}
+													currentUserId={user?.id ?? null}
+													onDelete={handleDeleteComment}
+													isLoading={commentsLoading}
+												/>
+												<CreateComment
+													postId={post.id}
+													onAdded={handleCommentAdded}
+												/>
+											</div>
 										)}
-									</div>
-								) : (
-									<div className="get-post-comments-section">
-										<GetComment
-											comments={comments}
-											currentUserId={user?.id ?? null}
-											onDelete={handleDeleteComment}
-											isLoading={commentsLoading}
-										/>
-										<CreateComment
-											postId={post.id}
-											onAdded={handleCommentAdded}
-										/>
-									</div>
-								)}
-							</IonGrid>
-						</div>
-					</>
+									</IonGrid>
+								</div>
+							</IonCol>
+						</IonRow>
+					</IonGrid>
 				)}
 
 				{/* ═══ المنشور غير موجود ═══ */}

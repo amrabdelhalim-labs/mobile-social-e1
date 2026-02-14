@@ -448,9 +448,9 @@ const UpdatePost: FC = () => {
 
 				{/* ═══ نموذج التعديل ═══ */}
 				{!isLoading && !loadError && (
-					<IonGrid>
+					<IonGrid className="form-container">
 						<IonRow className="ion-justify-content-center">
-							<IonCol sizeMd="8" sizeLg="6">
+							<IonCol size="12" sizeMd="10" sizeLg="8" sizeXl="6">
 								<IonList className="update-post-list">
 									{/* ═══ العنوان ═══ */}
 									<IonItem>

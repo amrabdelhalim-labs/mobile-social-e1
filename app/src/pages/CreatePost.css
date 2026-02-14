@@ -151,7 +151,31 @@
 .create-post-submit {
     padding: 16px;
 }
+/* ─── حاوية النموذج ─── */
+.form-container {
+    width: 100%;
+}
 
+/* ─── تحسينات للشاشات الكبيرة ─── */
+@media (min-width: 768px) {
+    .create-post-swiper {
+        height: 300px;
+    }
+
+    .create-post-swiper ion-img {
+        height: 300px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .create-post-swiper {
+        height: 350px;
+    }
+
+    .create-post-swiper ion-img {
+        height: 350px;
+    }
+}
 .create-post-submit ion-button {
     --border-radius: 10px;
     height: 48px;

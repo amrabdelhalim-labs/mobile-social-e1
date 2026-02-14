@@ -254,3 +254,32 @@
     font-size: 1rem;
     font-weight: 600;
 }
+
+/* ─── تحسينات للشاشات الكبيرة ─── */
+@media (min-width: 768px) {
+    .update-post-swiper {
+        height: 300px;
+    }
+
+    .update-post-swiper ion-img {
+        height: 300px;
+    }
+
+    .update-post-new-photos-swiper {
+        height: 200px;
+    }
+
+    .update-post-new-photos-swiper ion-img {
+        height: 200px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .update-post-swiper {
+        height: 350px;
+    }
+
+    .update-post-swiper ion-img {
+        height: 350px;
+    }
+}

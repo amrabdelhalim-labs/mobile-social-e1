@@ -220,34 +220,40 @@ const MyPosts: React.FC = () => {
                     <IonRefresherContent />
                 </IonRefresher>
 
-                <IonGrid>
-                    <IonRow>
-                        {/* ─── قائمة المنشورات ─── */}
-                        {!loading && posts.length > 0 &&
-                            posts.map((post) => (
-                                <PostCard
-                                    key={post.id}
-                                    post={post}
-                                    showAuthor={false}
-                                    routerLink={`/tabs/posts/${post.id}`}
-                                    onOptions={handleOptions}
-                                />
-                            ))
-                        }
+                <IonGrid className="posts-container">
+                    <IonRow className="ion-justify-content-center">
+                        <IonCol size="12" sizeLg="10" sizeXl="8">
+                            <IonGrid className="ion-no-padding">
+                                <IonRow>
+                                    {/* ─── قائمة المنشورات ─── */}
+                                    {!loading && posts.length > 0 &&
+                                        posts.map((post) => (
+                                            <PostCard
+                                                key={post.id}
+                                                post={post}
+                                                showAuthor={false}
+                                                routerLink={`/tabs/posts/${post.id}`}
+                                                onOptions={handleOptions}
+                                            />
+                                        ))
+                                    }
 
-                        {/* ─── حالة فارغة ─── */}
-                        {!loading && posts.length === 0 && (
-                            <IonCol size="12" sizeMd="6" offsetMd="3">
-                                <IonCard className="ion-padding ion-text-center">
-                                    <IonCardTitle color="primary">
-                                        لا توجد منشورات لعرضها
-                                    </IonCardTitle>
-                                    <IonText color="medium">
-                                        <p>ابدأ بإنشاء منشورك الأول!</p>
-                                    </IonText>
-                                </IonCard>
-                            </IonCol>
-                        )}
+                                    {/* ─── حالة فارغة ─── */}
+                                    {!loading && posts.length === 0 && (
+                                        <IonCol size="12">
+                                            <IonCard className="ion-padding ion-text-center">
+                                                <IonCardTitle color="primary">
+                                                    لا توجد منشورات لعرضها
+                                                </IonCardTitle>
+                                                <IonText color="medium">
+                                                    <p>ابدأ بإنشاء منشورك الأول!</p>
+                                                </IonText>
+                                            </IonCard>
+                                        </IonCol>
+                                    )}
+                                </IonRow>
+                            </IonGrid>
+                        </IonCol>
                     </IonRow>
                 </IonGrid>
 

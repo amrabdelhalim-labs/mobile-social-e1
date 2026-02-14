@@ -104,6 +104,34 @@
     transform: scale(1.05);
 }
 
+/* ─── حاوية المنشور ─── */
+.get-post-container {
+    width: 100%;
+}
+
+/* ─── تحسينات للشاشات الكبيرة ─── */
+@media (min-width: 768px) {
+    .get-post-swiper {
+        height: 400px;
+    }
+
+    .get-post-swiper ion-img {
+        height: 400px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .get-post-swiper {
+        height: 500px;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .get-post-swiper ion-img {
+        height: 500px;
+    }
+}
+
 /* ─── محتوى المنشور ─── */
 .get-post-content-section {
     animation: fadeIn 0.3s ease;

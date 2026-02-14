@@ -68,7 +68,7 @@ const PostCard: React.FC<PostCardProps> = ({
     const likesCount = post.likesCount ?? 0;
 
     return (
-        <IonCol size="12" sizeMd="6" key={post.id}>
+        <IonCol size="12" sizeMd="6" sizeLg="6" sizeXl="4" key={post.id}>
             <IonCard
                 className="post-card"
                 routerLink={routerLink}
