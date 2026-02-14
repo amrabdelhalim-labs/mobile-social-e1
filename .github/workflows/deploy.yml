@@ -10,6 +10,10 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   # Job 1: Deploy Server to server branch
   deploy-server:
@@ -49,6 +53,9 @@ jobs:
   # Job 2: Build and deploy Web to web branch and GitHub Pages
   deploy-web:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v4
