@@ -1,0 +1,252 @@
+name: Deploy All Platforms
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  # Job 1: Deploy Server to server branch
+  deploy-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create and push server branch
+        run: |
+          # Create orphan branch if it doesn't exist
+          git checkout --orphan server || git checkout server
+          
+          # Remove all files
+          git rm -rf . || true
+          
+          # Copy server folder from main
+          git checkout main -- server
+          
+          # Move server contents to root
+          mv server/* . || true
+          mv server/.* . 2>/dev/null || true
+          rmdir server || true
+          
+          # Commit and push
+          git add .
+          git commit -m "Update server from main - $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push -f origin server
+
+  # Job 2: Build and deploy Web to web branch and GitHub Pages
+  deploy-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: app/package.json
+
+      - name: Install dependencies
+        working-directory: ./app
+        run: npm ci
+
+      - name: Build Ionic Web
+        working-directory: ./app
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: |
+          npm run build
+          # Ionic/Vite builds to dist folder by default
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy to web branch
+        run: |
+          # Create orphan branch if it doesn't exist
+          git checkout --orphan web || git checkout web
+          
+          # Remove all files
+          git rm -rf . || true
+          
+          # Copy dist folder contents
+          cp -r app/dist/* . || cp -r app/build/* .
+          
+          # Create .nojekyll file for GitHub Pages
+          touch .nojekyll
+          
+          # Commit and push
+          git add .
+          git commit -m "Update web build from main - $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push -f origin web
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './app/dist'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # Job 3: Build and deploy iOS to ios branch
+  deploy-ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: app/package.json
+
+      - name: Install dependencies
+        working-directory: ./app
+        run: npm ci
+
+      - name: Build Ionic iOS
+        working-directory: ./app
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: |
+          npm run build
+          npx cap sync ios
+          npx cap copy ios
+
+      - name: Build iOS App
+        working-directory: ./app/ios/App
+        run: |
+          # Install CocoaPods dependencies
+          pod install --repo-update || true
+          
+          # Build the iOS app
+          xcodebuild clean build \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            -allowProvisioningUpdates
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy to ios branch
+        run: |
+          # Create orphan branch if it doesn't exist
+          git checkout --orphan ios || git checkout ios
+          
+          # Remove all files
+          git rm -rf . || true
+          
+          # Copy iOS folder
+          git checkout main -- app/ios
+          mv app/ios/* . || true
+          mv app/ios/.* . 2>/dev/null || true
+          
+          # Commit and push
+          git add .
+          git commit -m "Update iOS build from main - $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push -f origin ios
+
+  # Job 4: Build and deploy Android to android branch
+  deploy-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: app/package.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        working-directory: ./app
+        run: npm ci
+
+      - name: Add Android Platform
+        working-directory: ./app
+        run: |
+          npx cap add android || echo "Android platform already exists"
+
+      - name: Build Ionic Android
+        working-directory: ./app
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: |
+          npm run build
+          npx cap sync android
+          npx cap copy android
+
+      - name: Build Android APK
+        working-directory: ./app/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy to android branch
+        run: |
+          # Create orphan branch if it doesn't exist
+          git checkout --orphan android || git checkout android
+          
+          # Remove all files
+          git rm -rf . || true
+          
+          # Copy Android folder
+          git checkout main -- app/android
+          mv app/android/* . || true
+          mv app/android/.* . 2>/dev/null || true
+          
+          # Commit and push
+          git add .
+          git commit -m "Update Android build from main - $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push -f origin android
